@@ -1,4 +1,4 @@
-# Membuat Pertanyaan dari File PDF menggunakan Flask dan LLM API
+# Membuat Pertanyaan Pilihan Ganda dari File PDF menggunakan Flask dan LLM API Cakra AI
 
 
 ## Yang saya gunakan
