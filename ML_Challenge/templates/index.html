@@ -3,22 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Load Dokumen dan Buat Pertanyaan</title>
+    <title>Aplikasi Pilihan Ganda Cakra.AI</title>
 </head>
 <body>
-    <h1>Cakra.AI LLM</h1>
-    <h2>Status Dokumen: {{ status }}</h2>
-    {% if pertanyaan %}
-    <h2>Hasil Pertanyaan:</h2>
-    <ol>
-        {% for p in pertanyaan %}
-        <li>
-            <p>{{ p }}</p>
-        </li>
-        {% endfor %}
-    </ol>
-    {% else %}
-    <p>Belum ada pertanyaan yang dihasilkan.</p>
-    {% endif %}
+    <h1>Status Dokumen: {{ status }}</h1>
+    <h2>Pertanyaan:</h2>
+    {% for p in pertanyaan %}
+        <p>{{ p }}</p>
+        <hr>
+    {% endfor %}
 </body>
 </html>
