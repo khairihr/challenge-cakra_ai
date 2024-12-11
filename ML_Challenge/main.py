@@ -28,10 +28,10 @@ def proses_pertanyaan(teks_dokumen):
         payload = {
             "model_name": "brain-v2",
             "messages": [
-                {"role": "system", "content": "Buat 5 pertanyaan pilihan ganda ABCD dalam bahasa Indonesia dari teks berikut. Jangan sertakan jawaban."},
+                {"role": "system", "content": "Buat 5 pertanyaan pilihan ganda ABCD dalam bahasa Indonesia dari teks pdf yang saya lampirkan dan sertakan jawaban yang benar setelah setiap pertanyaan. Dengan format Soal 1: Pertanyaan, ABCD, Jawab dan seterusnya"},
                 {"role": "user", "content": teks_dokumen}
             ],
-            "max_new_tokens": 300,
+            "max_new_tokens": 500,
             "temperature": 0.7
         }
 
@@ -51,14 +51,25 @@ def halaman_utama():
     teks_dokumen = baca_dokumen(PDF_PATH)
     if teks_dokumen:
         status = "Dokumen berhasil dimuat"
-        raw_pertanyaan = proses_pertanyaan(teks_dokumen)
-        pertanyaan = [p for p in raw_pertanyaan.split("\n") if p.strip()]
+        raw_output = proses_pertanyaan(teks_dokumen)
+
+        
+        hasil_split = raw_output.split("\n")
+
+       
+        pertanyaan = []
+        for baris in hasil_split:
+            baris_bersih = baris.lstrip("12345. ")
+            if baris_bersih:
+                pertanyaan.append(baris_bersih.strip())
+
     else:
         status = "Gagal memuat dokumen"
         pertanyaan = []
 
-    
     return render_template("index.html", status=status, pertanyaan=pertanyaan)
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)
