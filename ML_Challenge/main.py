@@ -4,7 +4,7 @@ from flask import Flask, render_template
 
 app = Flask(__name__)
 
-API_KEY = "Bearer 75f7a185-55a8-4aae-b0b2-47e016493b60"
+API_KEY = "Bearer <token Cakra AI>"
 API_URL = "https://saas.cakra.ai/genv2/llms"
 PDF_PATH = "E:\khrd\latihan\Cerita_rakyat-1-9-1.pdf"
 
