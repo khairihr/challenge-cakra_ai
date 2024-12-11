@@ -1,47 +1,64 @@
-pertanyaan = (("Siapa Nama Saya?"), 
-              ("Siapa Nama Ingame Saya?"), 
-              ("Siapa Kucing Saya?"), 
-              ("Siapa Pencipta Lagu POWER?"), 
-              ("Siapa G-Dragon?"))
-pilihan_jawaban = (("A. Khairi", "B. Ridho ", "C. Ahmad ", "D. Sahrudin "), 
-                   ("A. Ritter", "B. KHRD", "C. KHRI", "D. RHK"), 
-                   ("A. Jennie", "B. Karina", "C. Kawai", "D. Aespa"), 
-                   ("A. Sutopo", "B. Mahmud", "C. G-Dragon", "D. Dadang"), 
-                   ("A. Artis", "B. Selebriti", "C. Body Builder", "D. Rapper"))
-jawaban_benar = ("A", "A", "C", "C", "D")
-jawaban_user = []
-skor_total = 0
-indeks_pertanyaan = 0
+import requests
+import PyPDF2
+from flask import Flask, render_template
 
-for soal in pertanyaan:
-    print("---------------")
-    print(soal)
-    for pilihan in pilihan_jawaban[indeks_pertanyaan]:
-        print(pilihan)
+app = Flask(__name__)
 
-    jawaban = input("Jawab (A, B, C, D): ").upper()
-    jawaban_user.append(jawaban)
-    if jawaban == jawaban_benar[indeks_pertanyaan]:
-        skor_total += 1
-        print("BENAR COY")
+API_KEY = "Bearer 75f7a185-55a8-4aae-b0b2-47e016493b60"
+API_URL = "https://saas.cakra.ai/genv2/llms"
+PDF_PATH = "E:\khrd\latihan\Cerita_rakyat-1-9-1.pdf"
+
+def baca_dokumen(pdf_path):
+    teks = ""
+    try:
+        with open(pdf_path, "rb") as file:
+            reader = PyPDF2.PdfReader(file)
+            for halaman in reader.pages:
+                teks += halaman.extract_text()
+    except Exception as e:
+        print("Gagal membaca file PDF:", e)
+    return teks
+
+def proses_pertanyaan(teks_dokumen):
+    try:
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": API_KEY
+        }
+        payload = {
+            "model_name": "brain-v2",
+            "messages": [
+                {"role": "system", "content": "Buat 5 pertanyaan pilihan ganda ABCD dalam bahasa Indonesia dari teks berikut. Jangan sertakan jawaban."},
+                {"role": "user", "content": teks_dokumen}
+            ],
+            "max_new_tokens": 300,
+            "temperature": 0.7
+        }
+
+        response = requests.post(API_URL, headers=headers, json=payload)
+        if response.status_code == 200:
+            hasil = response.json()
+            return hasil.get("choices")[0].get("content", "").strip()
+        else:
+            print("Error API:", response.status_code, response.text)
+            return f"Error API: {response.status_code} {response.text}"
+    except Exception as e:
+        print("Terjadi error saat proses API:", e)
+        return "Error API."
+
+@app.route("/", methods=["GET"])
+def halaman_utama():
+    teks_dokumen = baca_dokumen(PDF_PATH)
+    if teks_dokumen:
+        status = "Dokumen berhasil dimuat"
+        raw_pertanyaan = proses_pertanyaan(teks_dokumen)
+        pertanyaan = [p for p in raw_pertanyaan.split("\n") if p.strip()]
     else:
-        print("SALAH EUYY")
-        print(f"Jawaban yang benernya {jawaban_benar[indeks_pertanyaan]}")
-    indeks_pertanyaan += 1
+        status = "Gagal memuat dokumen"
+        pertanyaan = []
 
-print("------------")
-print("    HASIL   ")
-print("------------")
+    
+    return render_template("index.html", status=status, pertanyaan=pertanyaan)
 
-print("Jawaban Benar: ", end="")
-for jawaban in jawaban_benar:
-    print(jawaban, end=" ")
-print()
-
-print("Jawaban Kamu: ", end="")
-for jawaban in jawaban_user:
-    print(jawaban, end=" ")
-print()
-
-skor_persen = (skor_total / len(pertanyaan) * 100)
-print(f"Nilainya adalah: {skor_persen}%")
+if __name__ == "__main__":
+    app.run(debug=True)
