@@ -121,10 +121,11 @@ File: `templates/index.html`
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hasil Pertanyaan</title>
+    <title>Aplikasi Pilihan Ganda Cakra.AI</title>
 </head>
 <body>
-    <h1>Hasil Pertanyaan:</h1>
+    <h1>Status Dokumen: {{ status }}</h1>
+    <h2>Pertanyaan:</h2>
     {% for p in pertanyaan %}
         <p>{{ p }}</p>
         <hr>
