@@ -106,10 +106,19 @@ def proses_pertanyaan(teks_dokumen):
 @app.route("/", methods=["GET"])
 def halaman_utama():
     teks_dokumen = baca_dokumen(PDF_PATH)
-    raw_output = proses_pertanyaan(teks_dokumen)
-    hasil_split = raw_output.split("\n")
-    pertanyaan = [baris.lstrip("12345. ").strip() for baris in hasil_split if baris.strip()]
-    return render_template("index.html", status="Berhasil", pertanyaan=pertanyaan)
+    if teks_dokumen:
+        status = "Dokumen berhasil dimuat"
+        raw_output = proses_pertanyaan(teks_dokumen)
+        hasil_split = raw_output.split("\n")
+        pertanyaan = []
+        for baris in hasil_split:
+            baris_bersih = baris.lstrip("12345. ")
+            if baris_bersih:
+                pertanyaan.append(baris_bersih.strip())
+    else:
+        status = "Gagal memuat dokumen"
+        pertanyaan = []
+    return render_template("index.html", status=status, pertanyaan=pertanyaan)
 ```
 - Fungsi ini memproses hasil dari API dan menampilkannya di halaman web
 
